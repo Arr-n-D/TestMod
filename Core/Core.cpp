@@ -31,8 +31,10 @@ namespace ArrND::Core
 
     void Core::FetchPlayer()
     {
-        if (Core::tempPlayer != nullptr && !Core::tempPlayer->IsUnreachable())
+        if (Core::tempPlayer != nullptr && !this->IsPlayerReady() && !Core::tempPlayer->IsUnreachable())
         {
+            //Output if we're still running to test our update loop
+            Output::send<LogLevel::Verbose>(STR("Running\n"));
             auto pos = Core::tempPlayer->K2_GetActorLocation();
             std::string posx = std::to_string(pos.X());
 
@@ -40,10 +42,24 @@ namespace ArrND::Core
             {
                 Output::send<LogLevel::Verbose>(STR("Player is set\n"));
                 this->SetPlayer(Core::tempPlayer);
-                delete Core::tempPlayer;
+                
             }
         }
     }
+
+    void Core::SetPlayer(AActor* tempPlayer) {
+        this->Player = tempPlayer;
+        this->SetPlayerReady(true);
+        delete Core::tempPlayer;
+    }
+
+    void Core::SetPlayerReady(bool isReady) {
+		this->isPlayerReady = isReady;
+	}
+
+    bool Core::IsPlayerReady() {
+		return this->isPlayerReady;
+	}
 
     void Core::OnUnrealInitialized()
     {

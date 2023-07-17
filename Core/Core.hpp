@@ -29,11 +29,11 @@ namespace ArrND::Core {
 
 			bool IsPlayerReady();
 
-			bool SetPlayerReady(bool isReady);
+			void SetPlayerReady(bool isReady);
 
 		private: 
 			AActor* Player;
-			bool isPlayerReady;
+			bool isPlayerReady = false;
 	};
 
 }
