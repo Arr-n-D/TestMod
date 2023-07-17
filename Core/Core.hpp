@@ -1,15 +1,39 @@
 #pragma once
+
+#include <Unreal/AActor.hpp>
+
+using namespace RC;
+using namespace RC::Unreal;
+
 namespace ArrND::Core {
 	class Core {
-	public: 
-		Core();
-		~Core();
+		public:
+			Core();
+			~Core();
 
-		void OnUnrealInitialized();
+			void OnUnrealInitialized();
 
-		void OnUnrealShutdown();
+			void OnUnrealShutdown();
 
-		void OnUpdate();
-		void OnUpdate(float DeltaTime);
+			void OnUpdate();
+
+			void FetchPlayer();			
+
+			inline static AActor* tempPlayer = nullptr;
+
+			static void OnActorBeginPlay(Unreal::AActor *Context);
+
+			void SetPlayer(AActor* Player);
+
+			AActor* GetPlayer();
+
+			bool IsPlayerReady();
+
+			bool SetPlayerReady(bool isReady);
+
+		private: 
+			AActor* Player;
+			bool isPlayerReady;
 	};
+
 }

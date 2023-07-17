@@ -2,7 +2,5 @@
 
 namespace ArrND::Events {
 
-	class EventManager {
 	
-	};
 }
