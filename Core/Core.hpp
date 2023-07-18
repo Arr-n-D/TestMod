@@ -18,12 +18,15 @@ namespace ArrND::Core {
 			void OnUpdate();
 
 			void FetchPlayer();			
-
+#pragma region SketchyShit
 			inline static AActor* tempPlayer = nullptr;
+			inline static bool playerSet = false; // Declaration
+			inline static bool* isPlayerSet = &playerSet; // Assigning address
+#pragma endregion
 
 			static void OnActorBeginPlay(Unreal::AActor *Context);
 
-			void SetPlayer(AActor* Player);
+			void SetPlayerObject(AActor* Player);
 
 			AActor* GetPlayer();
 
