@@ -59,12 +59,12 @@ public:
 #define TEST_MOD_API __declspec(dllexport)
 extern "C"
 {
-    TEST_MOD_API RC::CppUserModBase *start_mod()
+    TEST_MOD_API RC::CppUserModBase* start_mod()
     {
         return new TestMod();
     }
 
-    TEST_MOD_API void uninstall_mod(RC::CppUserModBase *mod)
+    TEST_MOD_API void uninstall_mod(RC::CppUserModBase* mod)
     {
         delete mod;
     }

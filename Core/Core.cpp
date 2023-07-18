@@ -14,7 +14,7 @@ using namespace RC::Unreal;
 
 namespace ArrND::Core
 {
-
+    int foundPlayerHowManyTimes = 0;
     Core::Core()
     {
         Output::send<LogLevel::Verbose>(STR("Core initialized"));
@@ -27,38 +27,47 @@ namespace ArrND::Core
     void Core::OnUpdate()
     {
         this->FetchPlayer();
+
     }
 
     void Core::FetchPlayer()
     {
-        if (Core::tempPlayer != nullptr && !this->IsPlayerReady() && !Core::tempPlayer->IsUnreachable())
-        {
-            //Output if we're still running to test our update loop
+        if (!Core::IsPlayerReady()) {
+            //print the 
             Output::send<LogLevel::Verbose>(STR("Running\n"));
-            auto pos = Core::tempPlayer->K2_GetActorLocation();
-            std::string posx = std::to_string(pos.X());
-
-            if (!posx.starts_with("0") && !posx.starts_with("-0.0000"))
+            if (Core::tempPlayer != nullptr && foundPlayerHowManyTimes == 2)
             {
-                Output::send<LogLevel::Verbose>(STR("Player is set\n"));
-                this->SetPlayer(Core::tempPlayer);
-                
+                if (!Core::tempPlayer->IsUnreachable()) {
+                    auto pos = Core::tempPlayer->K2_GetActorLocation();
+                    std::string posx = std::to_string(pos.X());
+
+                    if (!posx.starts_with("0") && !posx.starts_with("-0.0000"))
+                    {
+                        Output::send<LogLevel::Verbose>(STR("Player is set\n"));
+                        this->SetPlayer(Core::tempPlayer);
+
+                    }
+                }
+
             }
         }
+       
     }
 
-    void Core::SetPlayer(AActor* tempPlayer) {
-        this->Player = tempPlayer;
-        this->SetPlayerReady(true);
-        delete Core::tempPlayer;
+    void Core::SetPlayerReadyState(bool isReady) {
+        this->isPlayerReady = isReady;
     }
-
-    void Core::SetPlayerReady(bool isReady) {
-		this->isPlayerReady = isReady;
-	}
 
     bool Core::IsPlayerReady() {
-		return this->isPlayerReady;
+        return this->isPlayerReady;
+    }
+
+    void Core::SetPlayer(AActor* Player)
+    {
+		this->Player = Player;
+        this->SetPlayerReadyState(true);
+        //set our temporary pointer to null 
+        Core::tempPlayer = nullptr;
 	}
 
     void Core::OnUnrealInitialized()
@@ -71,6 +80,7 @@ namespace ArrND::Core
         if (Context->GetName().starts_with(STR("BP_Biped_Player_C")))
         {
             Output::send<LogLevel::Verbose>(STR("PlayerController found\n"));
+            foundPlayerHowManyTimes++; 
             Core::tempPlayer = Context;
         }
     }

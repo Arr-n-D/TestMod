@@ -13,7 +13,7 @@ namespace ArrND::Core {
 
 			void OnUnrealInitialized();
 
-			void OnUnrealShutdown();
+			//void OnUnrealShutdown();
 
 			void OnUpdate();
 
@@ -29,7 +29,7 @@ namespace ArrND::Core {
 
 			bool IsPlayerReady();
 
-			void SetPlayerReady(bool isReady);
+			void SetPlayerReadyState(bool isReady);
 
 		private: 
 			AActor* Player;
