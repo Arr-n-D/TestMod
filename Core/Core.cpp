@@ -13,7 +13,7 @@
 
 using namespace RC;
 using namespace RC::Unreal;
-using namespace ArrND::Core::NetworkManager;
+using namespace ArrND::Core::Networking;
 
 namespace ArrND::Core
 {
@@ -34,10 +34,6 @@ namespace ArrND::Core
         //this->FetchPlayer();
 
     }
-
-    /*void Core::RunServer() {
-
-    }*/
 
     void Core::SetPlayerReadyState(bool isReady) {
         this->isPlayerReady = isReady;

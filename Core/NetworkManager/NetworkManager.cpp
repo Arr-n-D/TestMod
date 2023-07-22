@@ -3,7 +3,7 @@
 
 using namespace RC;
 
-namespace ArrND::Core::NetworkManager {
+namespace ArrND::Core::Networking {
 	NetworkManager::NetworkManager() {
 		//do nothing
 		Output::send<LogLevel::Verbose>(STR("NetworkManager initialized"));
@@ -56,75 +56,74 @@ namespace ArrND::Core::NetworkManager {
 		}
 	}
 
-	bool NetworkManager::InitClient() {
-		this->client = enet_host_create(NULL /* create a client host */,
-			1 /* only allow 1 outgoing connection */,
-			2 /* allow up 2 channels to be used, 0 and 1 */,
-			0 /* assume any amount of incoming bandwidth */,
-			0 /* assume any amount of outgoing bandwidth */);
-		if (client == NULL) {
-			Output::send<LogLevel::Error>(STR("An error occurred while trying to create an ENet client host.\n"));
-			return false;
+	void NetworkManager::SendMessage(void* data, GameMessage gMessage, bool isReliable)
+	{
+		if (gMessage == GameMessage::MOVE) {
+			ENetPacket* p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+			this->SendMovementMessage(p);
 		}
-		else {
+
+		ENetPacket* p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+		//enet_peer_send(this->communicationPeer, 0, p);
+
+	}
+
+	void NetworkManager::SendMovementMessage(ENetPacket* packket)
+	{
+
+	}
+
+	void NetworkManager::SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable)
+	{
+	}
+
+	bool NetworkManager::InitClient() {
+		this->clientHost = enet_host_create(NULL, 1, 2, 0, 0);
+
+		if (this->clientHost != NULL) {
 			return true;
+			Output::send<LogLevel::Verbose>(STR("ENet client host initialized.\n"));
 		}
 
 		return false;
 	}
 
-	bool NetworkManager::ConnectToServer()
+	void NetworkManager::ConnectToServer()
 	{
 
 		if (this->InitClient()) {
 			ENetAddress address;
 			ENetEvent event;
-			ENetPeer* peer;
+			ENetPeer* communicationPeer;
 
 			enet_address_set_host(&address, "localhost");
 			address.port = 9500;
 
-			peer = enet_host_connect(this->client, &address, 2, 0);
-			if (peer == NULL) {
+			communicationPeer = enet_host_connect(this->clientHost, &address, 2, 0);
+
+			if (communicationPeer == NULL) {
 				Output::send<LogLevel::Verbose>(STR("No available peers for initiating an ENet connection.\n"));
-				return false;
 			}
-			/* Wait up to 5 seconds for the connection attempt to succeed. */
-			if (enet_host_service(this->client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
+
+			if (enet_host_service(this->clientHost, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
 				Output::send<LogLevel::Verbose>(STR("Connection to localhost:8080 succeeded.\n"));
-				//return true;
-				this->OnUpdate(this->client);
-				return true;
-			}
-			else {
-				/* Either the 5 seconds are up or a disconnect event was */
-				/* received. Reset the peer in the event the 5 seconds   */
-				/* had run out without any significant event.            */
-				enet_peer_reset(peer);
+				this->isClientInitialized = true;
+				//this->OnUpdate(this->client);
+			} else {
+				enet_peer_reset(communicationPeer);
 				Output::send<LogLevel::Error>(STR("Connection to localhost:8080 failed.\n"));
 			}
-
-			return false;
 		}
-		else {
-			return false;
-		}
-
-		return false;
 		
 	}
 
 	bool NetworkManager::InitEnet()
 	{
-		if (enet_initialize() != 0) {
-			fprintf(stderr, "An error occurred while initializing ENet.\n");
-			return false;
-		}
-		else {
-			printf("ENet initialized.\n");
+		if (enet_initialize() == 0) {
+			Output::send<LogLevel::Verbose>(STR("ENet initialized.\n"));
 			return true;
 		}
-
+		
 		return false;
 	}
 }

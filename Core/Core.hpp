@@ -5,7 +5,7 @@
 
 using namespace RC;
 using namespace RC::Unreal;
-using namespace ArrND::Core::NetworkManager;
+using namespace ArrND::Core::Networking;
 
 namespace ArrND::Core {
 	class Core {
@@ -25,7 +25,7 @@ namespace ArrND::Core {
 
 			void SetPlayerReadyState(bool isReady);
 
-			NetworkManager::NetworkManager networkManagerInstance;
+			Networking::NetworkManager networkManagerInstance;
 
 		private: 
 			AActor* Player = NULL;
