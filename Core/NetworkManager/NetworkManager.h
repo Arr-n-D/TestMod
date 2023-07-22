@@ -7,11 +7,14 @@ namespace ArrND::Core::NetworkManager {
 			NetworkManager();
 			~NetworkManager();
 
-			void OnUpdate();
+			void OnUpdate(ENetHost* client);
 			bool ConnectToServer();
+			bool InitEnet();
+			bool InitClient();
+			void Run();
 
 
 		private : 
-			ENetHost* client = NULL;
+			ENetHost* client;
 	};
 }

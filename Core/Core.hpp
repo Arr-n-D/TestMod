@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Unreal/AActor.hpp>
+#include <Core/NetworkManager/NetworkManager.h>
 
 using namespace RC;
 using namespace RC::Unreal;

@@ -35,6 +35,10 @@ namespace ArrND::Core
 
     }
 
+    /*void Core::RunServer() {
+
+    }*/
+
     void Core::SetPlayerReadyState(bool isReady) {
         this->isPlayerReady = isReady;
         Output::send<LogLevel::Verbose>(STR("Player is set\n"));
@@ -57,6 +61,8 @@ namespace ArrND::Core
 
     void Core::OnUnrealInitialized()
     {
+        this->networkManagerInstance.Run();
+
         auto prehook = [](Unreal::UnrealScriptFunctionCallableContext& Context, void* CustomData) {
             //do nothing
         };
