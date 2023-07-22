@@ -4,6 +4,7 @@
 
 using namespace RC;
 using namespace RC::Unreal;
+using namespace ArrND::Core::NetworkManager;
 
 namespace ArrND::Core {
 	class Core {
@@ -13,20 +14,9 @@ namespace ArrND::Core {
 
 			void OnUnrealInitialized();
 
-			//void OnUnrealShutdown();
-
 			void OnUpdate();
 
-			void FetchPlayer();			
-#pragma region SketchyShit
-			inline static AActor* tempPlayer = nullptr;
-			inline static bool playerSet = false; // Declaration
-			inline static bool* isPlayerSet = &playerSet; // Assigning address
-#pragma endregion
-
-			static void OnActorBeginPlay(Unreal::AActor *Context);
-
-			void SetPlayerObject(AActor* Player);
+			void SetPlayer(AActor* Player);
 
 			AActor* GetPlayer();
 
@@ -34,8 +24,10 @@ namespace ArrND::Core {
 
 			void SetPlayerReadyState(bool isReady);
 
+			NetworkManager::NetworkManager networkManagerInstance;
+
 		private: 
-			AActor* Player;
+			AActor* Player = NULL;
 			bool isPlayerReady = false;
 	};
 
