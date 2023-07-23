@@ -1,6 +1,6 @@
 #pragma once 
 #include <enet/enet.h>
-#include "../GameMessage/GameMessages.h"
+#include "../GameMessage/network_enums.h"
 
 namespace ArrND::Core::Networking {
 	class NetworkManager {
@@ -8,20 +8,21 @@ namespace ArrND::Core::Networking {
 			NetworkManager();
 			~NetworkManager();
 
-			void OnUpdate(ENetHost* clientHost);
+			void OnUpdate();
 			void ConnectToServer();
 			bool InitEnet();
 			bool InitClient();
 			void Run();
 
-			void SendMessage(void* data, GameMessage gMessage, bool isReliable);
 			void SendMovementMessage(ENetPacket* p);
+			void SendGameMessage(void* data, GameMessage gMessage, bool isReliable);
 			void SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable);
+			bool IsCommunicationEstablished() { return isCommunicationEstablished; }
 
 
 		private : 
-			ENetHost* clientHost;
-			ENetPeer* communicationPeer;
-			bool isClientInitialized = false;
+			ENetHost* clientHost = NULL;
+			ENetPeer* communicationPeer = NULL;
+			bool isCommunicationEstablished = false;
 	};
 }

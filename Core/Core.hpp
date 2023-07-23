@@ -27,6 +27,8 @@ namespace ArrND::Core {
 
 			Networking::NetworkManager networkManagerInstance;
 
+			void RegisterKeyBinds();
+
 		private: 
 			AActor* Player = NULL;
 			bool isPlayerReady = false;

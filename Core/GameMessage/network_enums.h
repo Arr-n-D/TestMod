@@ -11,4 +11,16 @@ namespace ArrND::Core::Networking {
 		UNRELIABLE = 0,
 		RELIABLE = 1,
 	};
+
+	enum Channels {
+		MOVEMENT = 0,
+
+	};
+
+
+	struct PlayerMove {
+		float x;
+		float y;
+		float z;
+	};
 }

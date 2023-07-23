@@ -7,4 +7,4 @@ add_library(${TARGET} SHARED "dllmain.cpp" "Core/Core.cpp" "Core/NetworkManager/
 
 set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME main)
 target_include_directories(${TARGET} PRIVATE .)
-target_link_libraries(${TARGET} PUBLIC cppsdk xinput1_3 enet64.lib)
+target_link_libraries(${TARGET} PUBLIC cppsdk xinput1_3 ws2_32.lib winmm.lib D:/Dev/HLMMO/TestMod/enet64.lib)

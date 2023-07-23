@@ -6,8 +6,6 @@
 #include "Unreal/Hooks.hpp"
 #include "Core/Core.hpp"
 
-#include <chrono>
-#include <thread>
 
 using namespace RC;
 using namespace RC::Unreal;
@@ -16,7 +14,6 @@ using namespace ArrND;
 class TestMod : public RC::CppUserModBase
 {
 public:
-    bool hasBeenSet = false;
     Core::Core coreInstance = Core::Core();
 
     TestMod() : CppUserModBase()
@@ -50,7 +47,6 @@ extern "C"
 {
     TEST_MOD_API RC::CppUserModBase* start_mod()
     {
-        //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         return new TestMod();
     }
 

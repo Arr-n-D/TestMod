@@ -13,11 +13,11 @@ namespace ArrND::Core::Networking {
 		//do nothing
 	}
 
-	void NetworkManager::OnUpdate(ENetHost* client)
+	void NetworkManager::OnUpdate()
 	{
 		ENetEvent event;
 
-		while (enet_host_service(client, &event, 0))
+		while (enet_host_service(this->clientHost, &event, 0))
 		{
 			switch (event.type)
 			{
@@ -50,27 +50,34 @@ namespace ArrND::Core::Networking {
 
 	void NetworkManager::Run()
 	{
-		//do nothing
 		if (this->InitEnet()) {
 			this->ConnectToServer();
 		}
 	}
 
-	void NetworkManager::SendMessage(void* data, GameMessage gMessage, bool isReliable)
+	void NetworkManager::SendGameMessage(void* data, GameMessage gMessage, bool isReliable)
 	{
+		ENetPacket* p;
 		if (gMessage == GameMessage::MOVE) {
-			ENetPacket* p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+			p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
 			this->SendMovementMessage(p);
 		}
 
-		ENetPacket* p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
-		//enet_peer_send(this->communicationPeer, 0, p);
+		if (isReliable) {
+			 p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+		}
+		else {
+			 p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
+		}
+
+		this->SendGameMessage(p, gMessage, isReliable);
+		
 
 	}
 
-	void NetworkManager::SendMovementMessage(ENetPacket* packket)
+	void NetworkManager::SendMovementMessage(ENetPacket* packet)
 	{
-
+		enet_peer_send(this->communicationPeer, Channels::MOVEMENT, packet);
 	}
 
 	void NetworkManager::SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable)
@@ -94,23 +101,23 @@ namespace ArrND::Core::Networking {
 		if (this->InitClient()) {
 			ENetAddress address;
 			ENetEvent event;
-			ENetPeer* communicationPeer;
+			//ENetPeer* communicationPeer;
 
 			enet_address_set_host(&address, "localhost");
 			address.port = 9500;
 
-			communicationPeer = enet_host_connect(this->clientHost, &address, 2, 0);
+			this->communicationPeer = enet_host_connect(this->clientHost, &address, 2, 0);
 
-			if (communicationPeer == NULL) {
+			if (this->communicationPeer == NULL) {
 				Output::send<LogLevel::Verbose>(STR("No available peers for initiating an ENet connection.\n"));
 			}
 
 			if (enet_host_service(this->clientHost, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
 				Output::send<LogLevel::Verbose>(STR("Connection to localhost:8080 succeeded.\n"));
-				this->isClientInitialized = true;
+				this->isCommunicationEstablished = true;
 				//this->OnUpdate(this->client);
 			} else {
-				enet_peer_reset(communicationPeer);
+				enet_peer_reset(this->communicationPeer);
 				Output::send<LogLevel::Error>(STR("Connection to localhost:8080 failed.\n"));
 			}
 		}
