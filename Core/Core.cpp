@@ -12,6 +12,7 @@
 #include <Core/NetworkManager/NetworkManager.h>
 #include <Input/Handler.hpp>
 #include <thread>
+#include "msgpack.hpp"
 
 
 using namespace RC;
@@ -64,6 +65,7 @@ namespace ArrND::Core
     void Core::RegisterKeyBinds() {
         RegisterHotKey(NULL, 1, MOD_ALT | MOD_NOREPEAT, VK_F10);
         RegisterHotKey(NULL, 2, MOD_ALT | MOD_NOREPEAT, VK_F11);
+        RegisterHotKey(NULL, 3, MOD_ALT | MOD_NOREPEAT, VK_F12);
 
         MSG msg = { 0 };
         while (GetMessage(&msg, NULL, 0, 0) != 0)
@@ -79,14 +81,38 @@ namespace ArrND::Core
                         Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), pos.X(), pos.Y(), pos.Z());
                         //generate a base C++ struct with the position
                         PlayerMove position = { pos.X(), pos.Y(), pos.Z() };
-                        //send the position to the server
-						this->networkManagerInstance.SendGameMessage(&position, GameMessage::MOVE, false);
+                        //cast X y and Z to float and print them
+                        Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), position.x, position.y, position.z);
+                        std::stringstream buffer;
+                        msgpack::pack(buffer, position);
+
+                        //print the size of buffer
+                        Output::send<LogLevel::Verbose>(STR("Buffer size: {}\n"), buffer.str().size());
+                        const std::string tmp = buffer.str();
+                        //print the size of tmp
+                        Output::send<LogLevel::Verbose>(STR("Tmp size: {}\n"), tmp.size());
+                        const char* cstr = tmp.c_str();
+
+                        //print the size of cstr
+                        Output::send<LogLevel::Verbose>(STR("Cstr size: {}\n"), strlen(cstr));
+                        //printsize of sizeof
+                        Output::send<LogLevel::Verbose>(STR("Sizeof cstr size: {}\n"), sizeof(cstr));
+
+						this->networkManagerInstance.SendGameMessage(cstr, GameMessage::MOVE, false);
                     }
                     break;
                 case 2:
+                {
                     auto Player = UObjectGlobals::FindFirstOf(STR("Biped_Player"));
                     if (Player != nullptr && !Player->IsUnreachable()) {
                         this->SetPlayer((AActor*)Player);
+                    }
+                }
+                    
+
+                case 3:
+                    if (!this->networkManagerInstance.IsCommunicationEstablished()) {
+                        this->networkManagerInstance.ConnectToServer();
                     }
                 }
             }

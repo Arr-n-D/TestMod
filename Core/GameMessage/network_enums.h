@@ -1,4 +1,5 @@
 #pragma once
+#include "msgpack.hpp"
 
 namespace ArrND::Core::Networking {
 
@@ -22,5 +23,6 @@ namespace ArrND::Core::Networking {
 		float x;
 		float y;
 		float z;
+		MSGPACK_DEFINE(x, y, z);
 	};
 }

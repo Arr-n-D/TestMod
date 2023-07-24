@@ -1,6 +1,6 @@
 #include "NetworkManager.h"
 #include <DynamicOutput/DynamicOutput.hpp>
-
+#include "../GameMessage/network_enums.h"
 using namespace RC;
 
 namespace ArrND::Core::Networking {
@@ -41,6 +41,7 @@ namespace ArrND::Core::Networking {
 				break;
 
 			case ENET_EVENT_TYPE_DISCONNECT:
+				this->isCommunicationEstablished = false;
 				printf("%s disconnected.\n", event.peer->data);
 				/* Reset the peer's client information. */
 				event.peer->data = NULL;
@@ -55,19 +56,22 @@ namespace ArrND::Core::Networking {
 		}
 	}
 
-	void NetworkManager::SendGameMessage(void* data, GameMessage gMessage, bool isReliable)
+	void NetworkManager::SendGameMessage(const char* data, GameMessage gMessage, bool isReliable)
 	{
+		//Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), v2.x, v2.y, v2.z);
+		//get the size of data by reconstructing it as a string
+		
 		ENetPacket* p;
 		if (gMessage == GameMessage::MOVE) {
-			p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
+			p = enet_packet_create(data, strlen(data), ENET_PACKET_FLAG_UNSEQUENCED);
 			this->SendMovementMessage(p);
 		}
 
 		if (isReliable) {
-			 p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+			 p = enet_packet_create(data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
 		}
 		else {
-			 p = enet_packet_create(&data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
+			 p = enet_packet_create(data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
 		}
 
 		this->SendGameMessage(p, gMessage, isReliable);
