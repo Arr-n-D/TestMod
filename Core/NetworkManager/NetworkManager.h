@@ -15,7 +15,7 @@ namespace ArrND::Core::Networking {
 			void Run();
 
 			void SendMovementMessage(ENetPacket* p);
-			void SendGameMessage(const char* data, GameMessage gMessage, bool isReliable);
+			void SendGameMessage(const char* data , size_t sizeOfMessage, GameMessage gMessage, bool isReliable);
 			void SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable);
 			bool IsCommunicationEstablished() { return isCommunicationEstablished; }
 

@@ -81,24 +81,18 @@ namespace ArrND::Core
                         Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), pos.X(), pos.Y(), pos.Z());
                         //generate a base C++ struct with the position
                         PlayerMove position = { pos.X(), pos.Y(), pos.Z() };
-                        //cast X y and Z to float and print them
-                        Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), position.x, position.y, position.z);
-                        std::stringstream buffer;
+                      
+                        msgpack::sbuffer buffer;
                         msgpack::pack(buffer, position);
 
-                        //print the size of buffer
-                        Output::send<LogLevel::Verbose>(STR("Buffer size: {}\n"), buffer.str().size());
-                        const std::string tmp = buffer.str();
-                        //print the size of tmp
-                        Output::send<LogLevel::Verbose>(STR("Tmp size: {}\n"), tmp.size());
-                        const char* cstr = tmp.c_str();
+                        const char* data = buffer.data();
 
-                        //print the size of cstr
-                        Output::send<LogLevel::Verbose>(STR("Cstr size: {}\n"), strlen(cstr));
-                        //printsize of sizeof
-                        Output::send<LogLevel::Verbose>(STR("Sizeof cstr size: {}\n"), sizeof(cstr));
+                        //print size of data
+                        Output::send<LogLevel::Verbose>(STR("Size of data: {}\n"), buffer.size());
+                        //print size of data strlen
+                        Output::send<LogLevel::Verbose>(STR("Size of data strlen: {}\n"), strlen(data));
 
-						this->networkManagerInstance.SendGameMessage(cstr, GameMessage::MOVE, false);
+                        this->networkManagerInstance.SendGameMessage(data, buffer.size(), GameMessage::MOVE, false);
                     }
                     break;
                 case 2:

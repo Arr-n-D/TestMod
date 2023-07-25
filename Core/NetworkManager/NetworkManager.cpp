@@ -56,25 +56,30 @@ namespace ArrND::Core::Networking {
 		}
 	}
 
-	void NetworkManager::SendGameMessage(const char* data, GameMessage gMessage, bool isReliable)
+	void NetworkManager::SendGameMessage(const char* data, size_t sizeOfMessage, GameMessage gMessage, bool isReliable)
 	{
-		//Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), v2.x, v2.y, v2.z);
-		//get the size of data by reconstructing it as a string
+		//char* bufferCopy = new char[buffer.length() + 1];
+		////without using c_str or const char, we need to fill bufferCopy with data
+		//std::copy(buffer.begin(), buffer.end(), bufferCopy);
+
+		Output::send<LogLevel::Verbose>(STR("Sending message to server with size supposedly {}\n"), sizeOfMessage);
 		
 		ENetPacket* p;
 		if (gMessage == GameMessage::MOVE) {
-			p = enet_packet_create(data, strlen(data), ENET_PACKET_FLAG_UNSEQUENCED);
+			p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_UNSEQUENCED);
 			this->SendMovementMessage(p);
 		}
 
 		if (isReliable) {
-			 p = enet_packet_create(data, sizeof(GameMessage), ENET_PACKET_FLAG_RELIABLE);
+			 p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_RELIABLE);
 		}
 		else {
-			 p = enet_packet_create(data, sizeof(GameMessage), ENET_PACKET_FLAG_UNSEQUENCED);
+			 p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_UNSEQUENCED);
 		}
 
 		this->SendGameMessage(p, gMessage, isReliable);
+
+		//delete[] bufferCopy;
 		
 
 	}
@@ -86,6 +91,7 @@ namespace ArrND::Core::Networking {
 
 	void NetworkManager::SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable)
 	{
+
 	}
 
 	bool NetworkManager::InitClient() {
