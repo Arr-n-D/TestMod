@@ -5,6 +5,7 @@
 #include "Unreal/AActor.hpp"
 #include "Unreal/Hooks.hpp"
 #include "Core/Core.hpp"
+#include "sentry.h"
 
 
 using namespace RC;
@@ -22,13 +23,11 @@ public:
         ModVersion = STR("1.0");
         ModDescription = STR("This is my awesome mod");
         ModAuthors = STR("UE4SS Team");
-
-        //this->coreInstance = Core::Core();
-        //this->coreInstance.networkManagerInstance.Run();
     }
 
     ~TestMod()
     {
+        sentry_close();
     }
 
     auto on_unreal_init() -> void override

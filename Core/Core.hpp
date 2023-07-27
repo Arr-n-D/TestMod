@@ -14,24 +14,24 @@ namespace ArrND::Core {
 			~Core();
 
 			void OnUnrealInitialized();
-
 			void OnUpdate();
-
-			void SetPlayer(AActor* Player);
-
 			AActor* GetPlayer();
 
-			bool IsPlayerReady();
 
-			void SetPlayerReadyState(bool isReady);
-
-			Networking::NetworkManager networkManagerInstance;
-
-			void RegisterKeyBinds();
 
 		private: 
+			Networking::NetworkManager networkManagerInstance = NULL;
 			AActor* Player = NULL;
 			bool isPlayerReady = false;
+
+			void SetNetworkManagerInstance(Networking::NetworkManager networkManagerInstance);
+			void SetPlayerReadyState(bool isReady);
+			bool IsPlayerReady();
+			void InitializeSentry();
+			void FetchPlayerSteamId();
+			void SetPlayer(AActor* Player);
+			void RegisterKeyBinds();
+			void GetPlayerInstance();
 	};
 
 }

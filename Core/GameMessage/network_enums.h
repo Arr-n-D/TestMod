@@ -5,7 +5,6 @@ namespace ArrND::Core::Networking {
 
 	enum GameMessage {
 		MOVE = 0,
-
 	};
 
 	enum GameMessageReliability {
@@ -17,7 +16,6 @@ namespace ArrND::Core::Networking {
 		MOVEMENT = 0,
 
 	};
-
 
 	struct PlayerMove {
 		float x;

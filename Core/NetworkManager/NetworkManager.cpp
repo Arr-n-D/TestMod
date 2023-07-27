@@ -1,12 +1,12 @@
-#include "NetworkManager.h"
 #include <DynamicOutput/DynamicOutput.hpp>
 #include "../GameMessage/network_enums.h"
-using namespace RC;
+#include "NetworkManager.h"
+
 
 namespace ArrND::Core::Networking {
-	NetworkManager::NetworkManager() {
-		//do nothing
+	NetworkManager::NetworkManager(AActor* Player) {
 		Output::send<LogLevel::Verbose>(STR("NetworkManager initialized"));
+		this->Player = Player;
 	}
 
 	NetworkManager::~NetworkManager() {
@@ -21,14 +21,6 @@ namespace ArrND::Core::Networking {
 		{
 			switch (event.type)
 			{
-			case ENET_EVENT_TYPE_CONNECT:
-				exit(0);
-				printf("A new client connected from %x:%u.\n",
-					event.peer->address.host,
-					event.peer->address.port);
-				/* Store any relevant client information here. */
-				//event.peer->data = "Client information";
-				break;
 			case ENET_EVENT_TYPE_RECEIVE:
 				printf("A packet of length %u containing %s was received from %s on channel %u.\n",
 					event.packet->dataLength,
@@ -42,7 +34,7 @@ namespace ArrND::Core::Networking {
 
 			case ENET_EVENT_TYPE_DISCONNECT:
 				this->isCommunicationEstablished = false;
-				printf("%s disconnected.\n", event.peer->data);
+				Output::send<LogLevel::Verbose>(STR("Disconnection succeeded\n"));
 				/* Reset the peer's client information. */
 				event.peer->data = NULL;
 			}
@@ -58,10 +50,6 @@ namespace ArrND::Core::Networking {
 
 	void NetworkManager::SendGameMessage(const char* data, size_t sizeOfMessage, GameMessage gMessage, bool isReliable)
 	{
-		//char* bufferCopy = new char[buffer.length() + 1];
-		////without using c_str or const char, we need to fill bufferCopy with data
-		//std::copy(buffer.begin(), buffer.end(), bufferCopy);
-
 		Output::send<LogLevel::Verbose>(STR("Sending message to server with size supposedly {}\n"), sizeOfMessage);
 		
 		ENetPacket* p;
@@ -77,10 +65,7 @@ namespace ArrND::Core::Networking {
 			 p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_UNSEQUENCED);
 		}
 
-		this->SendGameMessage(p, gMessage, isReliable);
-
-		//delete[] bufferCopy;
-		
+		this->SendGameMessage(p, gMessage, isReliable);		
 
 	}
 

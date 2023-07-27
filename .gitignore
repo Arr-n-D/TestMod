@@ -1,2 +1,5 @@
 out
 .vs
+crashpad_handler.exe
+sentry.dll
+sentry.lib
