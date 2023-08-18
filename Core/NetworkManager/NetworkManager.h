@@ -1,7 +1,7 @@
 #pragma once 
 #include <enet/enet.h>
-#include "../GameMessage/network_enums.h"
 #include <Unreal/AActor.hpp>
+#include "../GameMessage/network_enums.h"
 
 using namespace RC;
 using namespace RC::Unreal;
@@ -32,7 +32,8 @@ namespace ArrND::Core::Networking {
 
 
 #pragma region OnEvents
-			void HandleMovementMessage(ENetPacket* p);
-			#pragma endregion
+			void OnEvent(ENetEvent event);
+			void OnMessagedReceived(ENetEvent event);
+#pragma endregion
 	};
 }

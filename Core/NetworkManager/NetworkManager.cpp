@@ -15,28 +15,12 @@ namespace ArrND::Core::Networking {
 
 	void NetworkManager::OnUpdate()
 	{
-		ENetEvent event;
+		if (this->isCommunicationEstablished) {
+			ENetEvent event;
 
-		while (enet_host_service(this->clientHost, &event, 0))
-		{
-			switch (event.type)
+			while (enet_host_service(this->clientHost, &event, 0))
 			{
-			case ENET_EVENT_TYPE_RECEIVE:
-				printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-					event.packet->dataLength,
-					event.packet->data,
-					event.peer->data,
-					event.channelID);
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(event.packet);
-
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				this->isCommunicationEstablished = false;
-				Output::send<LogLevel::Verbose>(STR("Disconnection succeeded\n"));
-				/* Reset the peer's client information. */
-				event.peer->data = NULL;
+				this->OnEvent(event);
 			}
 		}
 	}
@@ -50,19 +34,27 @@ namespace ArrND::Core::Networking {
 
 	void NetworkManager::SendGameMessage(const char* data, size_t sizeOfMessage, GameMessage gMessage, bool isReliable)
 	{
-		Output::send<LogLevel::Verbose>(STR("Sending message to server with size supposedly {}\n"), sizeOfMessage);
+		Packet packet = { MOVE, sizeOfMessage, data };
+
+		msgpack::sbuffer buffer;
+		msgpack::pack(buffer, packet);
+
+		const char* toSendData = buffer.data();
+		size_t bufferSize = buffer.size();
+
+		Output::send<LogLevel::Verbose>(STR("Sending message to server with size supposedly {}\n"), bufferSize);
 		
 		ENetPacket* p;
 		if (gMessage == GameMessage::MOVE) {
-			p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_UNSEQUENCED);
+			p = enet_packet_create(toSendData, bufferSize, ENET_PACKET_FLAG_UNSEQUENCED);
 			this->SendMovementMessage(p);
 		}
 
 		if (isReliable) {
-			 p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_RELIABLE);
+			 p = enet_packet_create(toSendData, bufferSize, ENET_PACKET_FLAG_RELIABLE);
 		}
 		else {
-			 p = enet_packet_create(data, sizeOfMessage, ENET_PACKET_FLAG_UNSEQUENCED);
+			 p = enet_packet_create(toSendData, bufferSize, ENET_PACKET_FLAG_UNSEQUENCED);
 		}
 
 		this->SendGameMessage(p, gMessage, isReliable);		
@@ -77,6 +69,30 @@ namespace ArrND::Core::Networking {
 	void NetworkManager::SendGameMessage(ENetPacket* p, GameMessage gMessage, bool isReliable)
 	{
 
+	}
+
+	void NetworkManager::OnEvent(ENetEvent event)
+	{
+		switch (event.type)
+        {
+            case ENET_EVENT_TYPE_RECEIVE:
+				//Output::send<LogLevel::Verbose>(STR("Sending message to server with size supposedly {}\n"),);
+                //call handle message received
+                this->OnMessagedReceived(event);
+           
+            break;
+            //msgpack::sbuffer buffer;
+
+            case ENET_EVENT_TYPE_DISCONNECT:
+				Output::send<LogLevel::Verbose>(STR("Disconnected from the server\n"));
+				enet_peer_reset(this->communicationPeer);
+				this->isCommunicationEstablished = false;
+            break;
+        }
+	}
+
+	void NetworkManager::OnMessagedReceived(ENetEvent event)
+	{
 	}
 
 	bool NetworkManager::InitClient() {

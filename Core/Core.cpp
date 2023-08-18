@@ -84,11 +84,10 @@ namespace ArrND::Core
                             Output::send<LogLevel::Verbose>(STR("Player position: {} {} {}\n"), pos.X(), pos.Y(), pos.Z());
                             //generate a base C++ struct with the position
                             PlayerMove position = { pos.X(), pos.Y(), pos.Z() };
-                      
                             msgpack::sbuffer buffer;
                             msgpack::pack(buffer, position);
-
                             const char* data = buffer.data();
+
                             this->networkManagerInstance.SendGameMessage(data, buffer.size(), GameMessage::MOVE, false);
                         }
                         break;

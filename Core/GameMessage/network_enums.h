@@ -23,4 +23,11 @@ namespace ArrND::Core::Networking {
 		float z;
 		MSGPACK_DEFINE(x, y, z);
 	};
+
+	struct Packet {
+		int packetType;
+		size_t sizeOfMessage;
+		std::string data;
+		MSGPACK_DEFINE(packetType, sizeOfMessage, data);
+	};
 }
